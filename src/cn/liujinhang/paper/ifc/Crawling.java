@@ -7,11 +7,11 @@ public class Crawling {
 
 	public static void main(String[] args) {
 
-		IfdLibrarySpaider spaider = new IfdLibrarySpaider();
-		spaider.crawling();
-
 		IfcOntologyReader reader = new IfcOntologyReader();
 		reader.read();
+		
+		IfdLibrarySpaider spaider = new IfdLibrarySpaider(reader.getOntologyClasses());
+		spaider.crawlingIfdConceptOfOntologyClass();
 		
 	}
 
