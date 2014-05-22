@@ -1,4 +1,4 @@
-package cn.liujinhang.paper.ifc;
+package cn.liujinhang.paper.ifc.module;
 
 import java.io.File;
 import java.io.FileNotFoundException;
