@@ -1,11 +1,5 @@
 package cn.liujinhang.paper.ifc.module;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import no.catenda.peregrine.model.objects.json.IfdConcept;
 import cn.liujinhang.paper.ifc.module.thread.IdfConceptCrawlingThread;
 
