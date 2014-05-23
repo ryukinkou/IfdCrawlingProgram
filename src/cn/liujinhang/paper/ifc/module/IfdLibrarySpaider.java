@@ -1,14 +1,11 @@
 package cn.liujinhang.paper.ifc.module;
 
 import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -26,13 +23,13 @@ public class IfdLibrarySpaider {
 
 	private Map<String, OntClass> ontologyClasses;
 
-	private List<Future<IfdConcept>> result;
+	private Map<String, Future<List<IfdConcept>>> result;
 
 	private ExecutorService threadPool;
 
 	public IfdLibrarySpaider(Map<String, OntClass> ontologyClasses) {
 
-		this.result = new ArrayList<Future<IfdConcept>>();
+		this.result = new HashMap<String, Future<List<IfdConcept>>>();
 		this.ontologyClasses = ontologyClasses;
 		threadPool = Executors.newFixedThreadPool(10);
 
@@ -64,29 +61,49 @@ public class IfdLibrarySpaider {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void crawlingIfdConceptOfOntologyClass() {
 
 		try {
-			
+
 			this.login();
-			
-		} catch (Exception e1) {
-			e1.printStackTrace();
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		for (String uri : this.ontologyClasses.keySet()) {
 			String keyword = uri.substring(uri.indexOf("#") + 1);
 			IdfConceptCrawlingThread thread = new IdfConceptCrawlingThread();
 			thread.setKeyword(keyword);
-			Future<IfdConcept> future = threadPool.submit(thread);
-			this.result.add(future);
+			Future<List<IfdConcept>> future = threadPool.submit(thread);
+			this.result.put(keyword, future);
 		}
-		
-		for (Future<IfdConcept> future : this.result) {
-		
-			
+
+		for (String keyword : this.result.keySet()) {
+
+			try {
+				Future<List<IfdConcept>> future = this.result.get(keyword);
+				List<IfdConcept> concepts = future.get();
+
+				if (concepts != null) {
+					System.out.println("----------");
+					System.out.println(keyword + " | " + concepts.size());
+					for (IfdConcept concept : concepts) {
+						System.out.println(keyword + " | " + concept.getGuid());
+					}
+					System.out.println("----------");
+				} else {
+					System.out.println("----------");
+					System.out.println(keyword + " | nothing");
+					System.out.println("----------");
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}
-
 }

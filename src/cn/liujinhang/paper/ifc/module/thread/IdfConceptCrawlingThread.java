@@ -1,108 +1,101 @@
 package cn.liujinhang.paper.ifc.module.thread;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Callable;
+import java.util.List;
 
 import no.catenda.peregrine.model.objects.json.IfdConcept;
-import cn.liujinhang.paper.ifc.system.Constant;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SuppressWarnings("rawtypes")
-public class IdfConceptCrawlingThread implements Callable {
+import cn.liujinhang.paper.ifc.system.Constant;
+import cn.liujinhang.paper.ifc.system.ObjectMapperFactory;
+
+public class IdfConceptCrawlingThread extends BaseThread {
 
 	private String keyword;
 
 	private String guid;
 
-	public String getKeyword() {
-		return keyword;
+	public void setGuid(String guid) {
+		this.guid = guid;
 	}
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
 	}
 
-	public String getGuid() {
-		return guid;
-	}
-
-	public void setGuid(String guid) {
-		this.guid = guid;
-	}
-	
-	
-
 	@Override
-	public IfdConcept call() throws Exception {
+	public List<IfdConcept> call() throws Exception {
 
-		return this.search(keyword);
+		if (null != guid) {
+			return this.queryByGuid(guid);
+		}
+
+		if (null != keyword) {
+			return this.search(keyword);
+		}
+
+		return null;
 	}
 
-	private IfdConcept queryByGuid(String guid) throws Exception {
+	private List<IfdConcept> queryByGuid(String guid) throws Exception {
 
 		URL url = new URL(Constant.BSDD_BASE_URL + "/IfdConcept/" + guid);
 
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-				false);
 		URLConnection connection = url.openConnection();
 
 		connection.setRequestProperty("accept", "application/json");
 		connection.setDoOutput(true);
 
-		IfdConcept result = (IfdConcept) mapper.readValue(
-				connection.getInputStream(), IfdConcept.class);
+		List<IfdConcept> result = this.decodeJsonToEntities(
+				connection.getInputStream(), "IfdConcept");
 
 		return result;
 	}
 
-	private IfdConcept search(String keyword) throws Exception {
+	private List<IfdConcept> search(String keyword) throws Exception {
 
 		URL url = new URL(Constant.BSDD_BASE_URL + "/IfdConcept/search/"
 				+ keyword);
 
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-				false);
 		URLConnection connection = url.openConnection();
-
 		connection.setRequestProperty("accept", "application/json");
 		connection.setDoOutput(true);
-		String sCurrentLine;  
-        String sTotalString;  
-        sCurrentLine = "";  
-        sTotalString = "";  
-        InputStream l_urlStream;  
-        l_urlStream = connection.getInputStream();  
-        BufferedReader l_reader = new BufferedReader(new InputStreamReader(  
-                l_urlStream));  
-        while ((sCurrentLine = l_reader.readLine()) != null) {  
-            sTotalString += sCurrentLine + "\r\n";  
-  
-        }  
-        System.out.println(sTotalString);
-        
-        String a = sTotalString.replace("{\"IfdConcept\":", "");
-        
-        String b = a.substring(0,a.length());
-		
-		IfdConcept result = (IfdConcept) mapper.readValue(
-				b, IfdConcept.class);
-		
-		if(result.getGuid() != null){
-			
-			System.out.println(result.getGuid());
-			
-		}
-		
+
+		List<IfdConcept> result = this.decodeJsonToEntities(
+				connection.getInputStream(), "IfdConcept");
+
 		return result;
+	}
+
+	protected List<IfdConcept> decodeJsonToEntities(InputStream inputStream,
+			String rootNode) {
+
+		ObjectMapper mapper = ObjectMapperFactory.getInstance();
+		List<IfdConcept> result = null;
+
+		try {
+
+			JsonNode ifdConceptNode = mapper.readTree(inputStream)
+					.get(rootNode);
+			if (null != ifdConceptNode && ifdConceptNode.size() > 0) {
+
+				TypeReference<List<IfdConcept>> typeReference = new TypeReference<List<IfdConcept>>() {
+				};
+				result = mapper.readValue(ifdConceptNode.traverse(),
+						typeReference);
+			}
+			return result;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return result;
+		}
+
 	}
 
 }
