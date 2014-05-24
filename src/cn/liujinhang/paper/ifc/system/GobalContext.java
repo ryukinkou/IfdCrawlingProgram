@@ -7,10 +7,13 @@ import java.util.concurrent.Future;
 
 import com.hp.hpl.jena.ontology.OntClass;
 
+import no.catenda.peregrine.model.objects.json.IfdAPISession;
 import no.catenda.peregrine.model.objects.json.IfdConcept;
 import cn.liujinhang.paper.ifc.bean.ResultKey;
 
 public class GobalContext {
+
+	public static IfdAPISession IFDSession;
 
 	public static Map<String, OntClass> IFCOntologyClasses = new HashMap<String, OntClass>();
 

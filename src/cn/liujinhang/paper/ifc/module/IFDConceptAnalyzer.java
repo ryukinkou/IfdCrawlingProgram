@@ -10,10 +10,11 @@ import cn.liujinhang.paper.ifc.system.GobalContext;
 
 public class IFDConceptAnalyzer {
 
+	private int count = 0;
+
 	public void launch() {
 
-		for (ResultKey resultKey : GobalContext.IFDConceptResultMap
-				.keySet()) {
+		for (ResultKey resultKey : GobalContext.IFDConceptResultMap.keySet()) {
 
 			try {
 				List<IfdConcept> concepts = GobalContext.IFDConceptResultMap
@@ -32,25 +33,32 @@ public class IFDConceptAnalyzer {
 	public void analyze(List<IfdConcept> concepts) {
 
 		for (IfdConcept concept : concepts) {
-			
-			if(null != concept){
-				
-				if(concept.getConceptType() == IfdConceptTypeEnum.SUBJECT){
-					
+
+			if (null != concept) {
+
+				if (concept.getConceptType() == IfdConceptTypeEnum.SUBJECT) {
+
+					this.count++;
+
 					System.out.println("START-----" + concept.getGuid());
 					for (IfdName fullName : concept.getFullNames()) {
-						
-						System.out.println(fullName.getLanguage().getNameInSelf() + " | " +fullName.getLanguage().getNameInSelf() + " | " +fullName.getName());
-						
+
+						System.out.println(fullName.getLanguage()
+								.getNameInSelf()
+								+ " | "
+								+ fullName.getLanguage().getNameInSelf()
+								+ " | " + fullName.getName());
+
 					}
-					System.out.println("END-------" + concept.getGuid());
-					
+					System.out.println("END-------" + concept.getGuid() + " | "
+							+ this.count);
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
 
 }

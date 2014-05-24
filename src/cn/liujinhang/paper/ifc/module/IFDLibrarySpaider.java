@@ -16,6 +16,7 @@ import cn.liujinhang.paper.ifc.bean.ResultKey;
 import cn.liujinhang.paper.ifc.module.thread.IFDConceptCrawlingThread;
 import cn.liujinhang.paper.ifc.system.Constant;
 import cn.liujinhang.paper.ifc.system.GobalContext;
+import cn.liujinhang.paper.ifc.system.ObjectMapperFactory;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,15 +27,12 @@ public class IFDLibrarySpaider {
 	private ExecutorService threadPool;
 
 	public IFDLibrarySpaider() {
-		threadPool = Executors.newFixedThreadPool(50);
+		threadPool = Executors.newFixedThreadPool(10);
 	}
 
-	private IfdAPISession login() throws Exception {
+	private void login() throws Exception {
 
 		URL url = new URL(Constant.BSDD_BASE_URL + "/session/login");
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-				false);
 
 		URLConnection connection = url.openConnection();
 
@@ -48,10 +46,19 @@ public class IFDLibrarySpaider {
 		writer.flush();
 		writer.close();
 
-		IfdAPISession session = (IfdAPISession) mapper.readValue(
-				connection.getInputStream(), IfdAPISession.class);
+		connection.connect();
 
-		return session;
+	}
+
+	@SuppressWarnings("unused")
+	private void logout() throws Exception {
+
+		URL url = new URL(Constant.BSDD_BASE_URL + "/session/logout");
+
+		URLConnection connection = url.openConnection();
+		connection.setDoOutput(false);
+
+		connection.connect();
 
 	}
 
@@ -69,9 +76,11 @@ public class IFDLibrarySpaider {
 			IFDConceptCrawlingThread thread = new IFDConceptCrawlingThread();
 			thread.setKeyword(keyword);
 			Future<List<IfdConcept>> future = threadPool.submit(thread);
-			GobalContext.IFDConceptResultMap.put(new ResultKey(keyword,
-					false), future);
+			GobalContext.IFDConceptResultMap.put(new ResultKey(keyword, false),
+					future);
 		}
+
+		this.threadPool.shutdown();
 
 	}
 }
