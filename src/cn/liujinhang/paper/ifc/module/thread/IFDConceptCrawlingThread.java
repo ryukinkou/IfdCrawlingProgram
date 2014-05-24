@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.liujinhang.paper.ifc.system.Constant;
 import cn.liujinhang.paper.ifc.system.ObjectMapperFactory;
 
-public class IdfConceptCrawlingThread extends BaseThread {
+public class IFDConceptCrawlingThread extends BaseThread {
 
 	private String keyword;
 

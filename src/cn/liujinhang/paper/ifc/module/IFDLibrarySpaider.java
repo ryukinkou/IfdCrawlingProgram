@@ -12,27 +12,21 @@ import java.util.concurrent.Future;
 
 import no.catenda.peregrine.model.objects.json.IfdAPISession;
 import no.catenda.peregrine.model.objects.json.IfdConcept;
-import cn.liujinhang.paper.ifc.module.thread.IdfConceptCrawlingThread;
+import cn.liujinhang.paper.ifc.bean.ResultKey;
+import cn.liujinhang.paper.ifc.module.thread.IFDConceptCrawlingThread;
 import cn.liujinhang.paper.ifc.system.Constant;
+import cn.liujinhang.paper.ifc.system.GobalContext;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.hpl.jena.ontology.OntClass;
 
-public class IfdLibrarySpaider {
-
-	private Map<String, OntClass> ontologyClasses;
-
-	private Map<String, Future<List<IfdConcept>>> result;
+public class IFDLibrarySpaider {
 
 	private ExecutorService threadPool;
 
-	public IfdLibrarySpaider(Map<String, OntClass> ontologyClasses) {
-
-		this.result = new HashMap<String, Future<List<IfdConcept>>>();
-		this.ontologyClasses = ontologyClasses;
-		threadPool = Executors.newFixedThreadPool(10);
-
+	public IFDLibrarySpaider() {
+		threadPool = Executors.newFixedThreadPool(50);
 	}
 
 	private IfdAPISession login() throws Exception {
@@ -62,47 +56,21 @@ public class IfdLibrarySpaider {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void crawlingIfdConceptOfOntologyClass() {
+	public void crawl() {
 
 		try {
-
 			this.login();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		for (String uri : this.ontologyClasses.keySet()) {
+		for (String uri : GobalContext.IFCOntologyClasses.keySet()) {
 			String keyword = uri.substring(uri.indexOf("#") + 1);
-			IdfConceptCrawlingThread thread = new IdfConceptCrawlingThread();
+			IFDConceptCrawlingThread thread = new IFDConceptCrawlingThread();
 			thread.setKeyword(keyword);
 			Future<List<IfdConcept>> future = threadPool.submit(thread);
-			this.result.put(keyword, future);
-		}
-
-		for (String keyword : this.result.keySet()) {
-
-			try {
-				Future<List<IfdConcept>> future = this.result.get(keyword);
-				List<IfdConcept> concepts = future.get();
-
-				if (concepts != null) {
-					System.out.println("----------");
-					System.out.println(keyword + " | " + concepts.size());
-					for (IfdConcept concept : concepts) {
-						System.out.println(keyword + " | " + concept.getGuid());
-					}
-					System.out.println("----------");
-				} else {
-					System.out.println("----------");
-					System.out.println(keyword + " | nothing");
-					System.out.println("----------");
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
+			GobalContext.IFDConceptResultMap.put(new ResultKey(keyword,
+					false), future);
 		}
 
 	}
