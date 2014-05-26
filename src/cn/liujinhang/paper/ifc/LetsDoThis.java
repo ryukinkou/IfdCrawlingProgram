@@ -1,7 +1,7 @@
 package cn.liujinhang.paper.ifc;
 
 import cn.liujinhang.paper.ifc.module.IFCOntologyReader;
-import cn.liujinhang.paper.ifc.module.IFDConceptAnalyzer;
+import cn.liujinhang.paper.ifc.module.IFCOntologyWriter;
 import cn.liujinhang.paper.ifc.module.IFDLibrarySpaider;
 
 public class LetsDoThis {
@@ -9,13 +9,13 @@ public class LetsDoThis {
 	public static void main(String[] args) {
 
 		IFCOntologyReader reader = new IFCOntologyReader();
-		reader.read();
+		reader.lanuch();
 
 		IFDLibrarySpaider spaider = new IFDLibrarySpaider();
-		spaider.crawl();
+		spaider.lanuch();
 
-		IFDConceptAnalyzer analyzer = new IFDConceptAnalyzer();
-		analyzer.launch();
+		IFCOntologyWriter writer = new IFCOntologyWriter();
+		writer.launch();
 
 	}
 

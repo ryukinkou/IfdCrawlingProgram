@@ -3,24 +3,16 @@ package cn.liujinhang.paper.ifc.module;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import no.catenda.peregrine.model.objects.json.IfdAPISession;
 import no.catenda.peregrine.model.objects.json.IfdConcept;
 import cn.liujinhang.paper.ifc.bean.ResultKey;
 import cn.liujinhang.paper.ifc.module.thread.IFDConceptCrawlingThread;
 import cn.liujinhang.paper.ifc.system.Constant;
 import cn.liujinhang.paper.ifc.system.GobalContext;
-import cn.liujinhang.paper.ifc.system.ObjectMapperFactory;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hp.hpl.jena.ontology.OntClass;
 
 public class IFDLibrarySpaider {
 
@@ -63,7 +55,7 @@ public class IFDLibrarySpaider {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void crawl() {
+	public void lanuch() {
 
 		try {
 			this.login();
@@ -76,8 +68,8 @@ public class IFDLibrarySpaider {
 			IFDConceptCrawlingThread thread = new IFDConceptCrawlingThread();
 			thread.setKeyword(keyword);
 			Future<List<IfdConcept>> future = threadPool.submit(thread);
-			GobalContext.IFDConceptResultMap.put(new ResultKey(keyword, false),
-					future);
+			GobalContext.IFDConceptResultMap.put(
+					GobalContext.IFCOntologyClasses.get(uri), future);
 		}
 
 		this.threadPool.shutdown();

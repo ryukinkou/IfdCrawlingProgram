@@ -6,26 +6,21 @@ import cn.liujinhang.paper.ifc.system.Constant;
 import cn.liujinhang.paper.ifc.system.GobalContext;
 
 import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class IFCOntologyReader {
 
-	private OntModel ontology;
-
-	
-
 	public IFCOntologyReader() {
-		this.ontology = ModelFactory.createOntologyModel();
-		ontology.read(Constant.IFC_OWL_FILE_PATH);
+		GobalContext.IFCOntology = ModelFactory.createOntologyModel();
+		GobalContext.IFCOntology.read(Constant.INPUT_IFC_OWL_FILE_PATH);
 	}
 
-	public void read() {
+	public void lanuch() {
 		this.findOntologyClasses();
 	}
 
 	public void findOntologyClasses() {
-		Iterator<OntClass> iterator = ontology.listClasses();
+		Iterator<OntClass> iterator = GobalContext.IFCOntology.listClasses();
 		OntClass clazz = null;
 		while (iterator.hasNext()) {
 			clazz = iterator.next();
@@ -33,14 +28,6 @@ public class IFCOntologyReader {
 				GobalContext.IFCOntologyClasses.put(clazz.getURI(), clazz);
 			}
 		}
-	}
-
-	public OntModel getOntology() {
-		return ontology;
-	}
-
-	public void setOntology(OntModel ontology) {
-		this.ontology = ontology;
 	}
 
 }

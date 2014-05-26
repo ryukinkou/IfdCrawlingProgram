@@ -16,9 +16,9 @@
 	<classpathentry kind="lib" path="ThirdParty/jena/slf4j-log4j12-1.6.4.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/jena/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/jena/xml-apis-1.4.01.jar"/>
-	<classpathentry kind="lib" path="ThirdParty/peregrineapi/peregrineapi-json-client.jar" sourcepath="ThirdParty/peregrineapi/peregrineapi-json-client-sources.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/jackson/jackson-annotations-2.2.3.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/jackson/jackson-core-2.2.3.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/jackson/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="ThirdParty/peregrineapi/peregrineapi-json-client.jar" sourcepath="ThirdParty/peregrineapi/peregrineapi-json-client-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
