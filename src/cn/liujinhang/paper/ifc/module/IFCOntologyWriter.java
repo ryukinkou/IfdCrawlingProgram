@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 import no.catenda.peregrine.model.objects.json.IfdConcept;
 import no.catenda.peregrine.model.objects.json.IfdConceptTypeEnum;
@@ -13,23 +15,27 @@ import no.catenda.peregrine.model.objects.json.IfdName;
 import cn.liujinhang.paper.ifc.system.Constant;
 import cn.liujinhang.paper.ifc.system.CustomAnnotationProperty;
 import cn.liujinhang.paper.ifc.system.GobalContext;
-import cn.liujinhang.paper.ifc.system.ReflectionUtils;
 
-import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.tdb.lib.Lib2;
 
 public class IFCOntologyWriter {
 
+	private Map<OntClass, Future<List<IfdConcept>>> conceptResult;
+
+	public IFCOntologyWriter(
+			Map<OntClass, Future<List<IfdConcept>>> conceptResult) {
+		this.conceptResult = conceptResult;
+	}
+
 	public void launch() {
 
-		for (OntClass ontClazz : GobalContext.IFDConceptResultMap.keySet()) {
+		for (OntClass ontClazz : this.conceptResult.keySet()) {
 
 			try {
-				List<IfdConcept> concepts = GobalContext.IFDConceptResultMap
-						.get(ontClazz).get();
+				List<IfdConcept> concepts = this.conceptResult.get(ontClazz)
+						.get();
 				if (concepts != null) {
 					this.analyze(ontClazz, concepts);
 				}
@@ -51,6 +57,8 @@ public class IFCOntologyWriter {
 	}
 
 	public void analyze(OntClass ontClazz, List<IfdConcept> concepts) {
+
+		System.out.println(ontClazz.getURI());
 
 		for (IfdConcept concept : concepts) {
 

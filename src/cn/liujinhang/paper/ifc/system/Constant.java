@@ -8,10 +8,10 @@ public final class Constant {
 
 	public static final String BSDD_LOGIN_PASSWORD = "123456";
 
-	public static final String INPUT_IFC_OWL_FILE_PATH = "/Users/RYU/git/IfcTranslateProgram/ifc/ifcOWL_stage1.owl";
+	public static final String INPUT_IFC_OWL_FILE_PATH = "/Users/RYU/git/IfcPsetTranslateProgram/ifcPset/ifcOWL_phase_3.owl";
 
 	public static final String OUTPUT_IFC_OWL_FILE_PATH = System
-			.getProperty("user.dir") + "/ifd/ifcOWL_stage2.owl";
+			.getProperty("user.dir") + "/ifd/ifcOWL_phare4.owl";
 
 	public static final String TARGET_NAMESPACE = "http://www.buildingsmart-tech.org/ifcXML/IFC4/final";
 

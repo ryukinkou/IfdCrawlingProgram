@@ -3,23 +3,30 @@ package cn.liujinhang.paper.ifc.module;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import no.catenda.peregrine.model.objects.json.IfdConcept;
-import cn.liujinhang.paper.ifc.bean.ResultKey;
 import cn.liujinhang.paper.ifc.module.thread.IFDConceptCrawlingThread;
 import cn.liujinhang.paper.ifc.system.Constant;
-import cn.liujinhang.paper.ifc.system.GobalContext;
+
+import com.hp.hpl.jena.ontology.OntClass;
 
 public class IFDLibrarySpaider {
 
 	private ExecutorService threadPool;
 
-	public IFDLibrarySpaider() {
-		threadPool = Executors.newFixedThreadPool(10);
+	private Map<String, OntClass> classMap;
+
+	public IFDLibrarySpaider(Map<String, OntClass> classMap) {
+
+		this.classMap = classMap;
+
+		threadPool = Executors.newFixedThreadPool(1);
 	}
 
 	private void login() throws Exception {
@@ -40,6 +47,8 @@ public class IFDLibrarySpaider {
 
 		connection.connect();
 
+		System.out.println("login");
+
 	}
 
 	@SuppressWarnings("unused")
@@ -55,24 +64,31 @@ public class IFDLibrarySpaider {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void lanuch() {
+	public Map<OntClass, Future<List<IfdConcept>>> launch() {
+
+		Map<OntClass, Future<List<IfdConcept>>> conceptResult = null;
 
 		try {
+
+			conceptResult = new HashMap<OntClass, Future<List<IfdConcept>>>();
+
 			this.login();
+
+			for (String uri : classMap.keySet()) {
+				String keyword = uri.substring(uri.indexOf("#") + 1);
+				IFDConceptCrawlingThread thread = new IFDConceptCrawlingThread();
+				thread.setKeyword(keyword);
+				Future<List<IfdConcept>> future = threadPool.submit(thread);
+				conceptResult.put(classMap.get(uri), future);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			this.threadPool.shutdown();
 		}
 
-		for (String uri : GobalContext.IFCOntologyClasses.keySet()) {
-			String keyword = uri.substring(uri.indexOf("#") + 1);
-			IFDConceptCrawlingThread thread = new IFDConceptCrawlingThread();
-			thread.setKeyword(keyword);
-			Future<List<IfdConcept>> future = threadPool.submit(thread);
-			GobalContext.IFDConceptResultMap.put(
-					GobalContext.IFCOntologyClasses.get(uri), future);
-		}
-
-		this.threadPool.shutdown();
+		return conceptResult;
 
 	}
 }

@@ -1,6 +1,8 @@
 package cn.liujinhang.paper.ifc.module;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import cn.liujinhang.paper.ifc.system.Constant;
 import cn.liujinhang.paper.ifc.system.GobalContext;
@@ -15,19 +17,24 @@ public class IFCOntologyReader {
 		GobalContext.IFCOntology.read(Constant.INPUT_IFC_OWL_FILE_PATH);
 	}
 
-	public void lanuch() {
-		this.findOntologyClasses();
+	public Map<String, OntClass> launch() {
+		return this.findOntologyClasses();
 	}
 
-	public void findOntologyClasses() {
+	public Map<String, OntClass> findOntologyClasses() {
+
+		Map<String, OntClass> classMap = new HashMap<String, OntClass>();
+
 		Iterator<OntClass> iterator = GobalContext.IFCOntology.listClasses();
 		OntClass clazz = null;
 		while (iterator.hasNext()) {
 			clazz = iterator.next();
 			if (clazz.getURI() != null) {
-				GobalContext.IFCOntologyClasses.put(clazz.getURI(), clazz);
+				classMap.put(clazz.getURI(), clazz);
 			}
 		}
+
+		return classMap;
 	}
 
 }
